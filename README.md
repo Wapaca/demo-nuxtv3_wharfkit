@@ -1,3 +1,9 @@
+# Minimal demo of using WharfKit with Nuxt 3
+
+NOT WORKING YET
+
+
+
 # Nuxt 3 Minimal Starter
 
 Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
