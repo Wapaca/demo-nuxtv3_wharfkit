@@ -4,8 +4,7 @@ import { WalletPluginAnchor } from '@wharfkit/wallet-plugin-anchor';
 import { WalletPluginCloudWallet } from '@wharfkit/wallet-plugin-cloudwallet';
 import WebRenderer from '@wharfkit/web-renderer';
 
-const ui = new WebRenderer();
-
+const ui = (process.client) ? new WebRenderer() : null;
 const authStorageKey = 'demo-nuxtv3_wharfkit-auth';
 
 const sessionKit = new SessionKit({
@@ -16,7 +15,7 @@ const sessionKit = new SessionKit({
 	}],
 	storage: new BrowserLocalStorage(authStorageKey),
 	ui,
-	walletPlugins: (new WalletPluginAnchor(), new WalletPluginCloudWallet())
+	walletPlugins: [new WalletPluginAnchor(), new WalletPluginCloudWallet()]
 });
 
 const session = ref(null);
@@ -26,35 +25,41 @@ sessionKit.restore().then((s) => {
 });
 
 export function useSessionKit() {
-	const login = async function () {
-		const response = await sessionKit.login();
-		session.value = response.session;
-	};
-	const logout = async function () {
-		await sessionKit.logout(session.value);
-		session.value = undefined;
-	};
-	const transact = async function () {
-		if (!session.value) {
-			throw new Error('cannot transact without a session');
-		}
-		const action = {
-			account: 'eosio.token',
-			name: 'transfer',
-			authorization: [session.value.permissionLevel],
-			data: {
-				from: session.value.actor,
-				to: 'teamgreymass',
-				quantity: '0.00000001 WAX',
-				memo: 'Yay WharfKit! Thank you <3'
+	return {
+		login: async () => {
+			const response = await sessionKit.login();
+			session.value = response.session;
+		},
+		logout: async () => {
+			await sessionKit.logout(session.value);
+			session.value = null;
+		},
+		transact: async () => {
+			if (!session.value) {
+				throw new Error('cannot transact without a session');
 			}
-		};
-		session.value.transact({ action }, { broadcast: false }).catch((e) => {
-			console.log('error caught in transact', e);
-		});
-	};
+			const action = {
+				account: 'eosio.token',
+				name: 'transfer',
+				authorization: [session.value.permissionLevel],
+				data: {
+					from: session.value.actor,
+					to: 'teamgreymass',
+					quantity: '0.00000001 WAX',
+					memo: 'Yay WharfKit! Thank you <3'
+				}
+			};
+			try {
+				const trx_result = await session.value.transact({ action })
+				console.log(trx_result, 'trx_result')
+			}
+			catch(e) {
+				console.log('error caught in transact', e);
+			}
+		}
+	}
 }
 
 export function useSession() {
-	return session
+	return session.value
 }

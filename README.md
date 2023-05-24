@@ -1,7 +1,6 @@
 # Minimal demo of using WharfKit with Nuxt 3
 
-NOT WORKING YET
-
+Very basic demo, refresh not working. (had to remove type:module in package.json of web-renderer to make it works)
 
 
 # Nuxt 3 Minimal Starter
