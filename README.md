@@ -2,6 +2,7 @@
 
 Very basic demo, refresh not working. (had to remove type:module in package.json of web-renderer to make it works)
 
+PS: Thanks to Rakeden for sharing code
 
 # Nuxt 3 Minimal Starter
 
